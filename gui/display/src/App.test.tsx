@@ -15,6 +15,3 @@ test('la page contient "Reponse du serveur gRPC"', async () => {
     // Ensure React flushes the useEffect state update (mocked gRPC call).
     await screen.findByText("test");
 });
-
-
-
