@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.jest.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.jest.app.tsbuildinfo"
+  },
+  "exclude": [
+    "src/gen/**"
+  ]
+}
+
