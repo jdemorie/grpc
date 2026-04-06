@@ -1,0 +1,6 @@
+version: v2
+
+# Keep it simple: treat the local ./proto folder as the source of truth.
+modules:
+  - path: proto
+

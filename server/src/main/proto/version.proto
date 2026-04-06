@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.demo.grpc.server.version";
+option java_outer_classname = "VersionProto";
+
+package com.demo.grpc.server.version;
+
+service VersionService {
+  rpc GetVersion(VersionRequest) returns (VersionResponse) {
+  }
+}
+
+message VersionRequest {
+}
+
+message VersionResponse {
+  string version = 1;
+}
+
