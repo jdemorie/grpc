@@ -1,37 +1,26 @@
-import {useEffect, useState} from "react";
-import {createVersionClient} from "../../grpc/versionClient.ts";
-import {useGetVersion, useSetVersion} from "../../store/versionSlice.ts";
+import {useGetVersionQuery} from "../../store/versionApi";
+import {useMemo} from "react";
 
 function VersionPage() {
-    const version = useGetVersion();
-    const setVersion = useSetVersion();
-    const [error, setError] = useState<string | null>(null);
+    const {data, error, isLoading} = useGetVersionQuery();
 
-    useEffect(() => {
-        let cancelled = false;
-
-        (async () => {
-            try {
-                const client = createVersionClient();
-                const res = await client.getVersion({});
-                if (!cancelled) setVersion(res.response.version);
-            } catch (e) {
-                if (!cancelled) {
-                    const message = e instanceof Error ? e.message : String(e);
-                    setError(message);
-                }
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+    const errorMessage = useMemo(() => {
+        if (!error) {
+            return null;
+        }
+        if (typeof error === "object" && "message" in error) {
+            return String((error as { message?: unknown }).message);
+        }
+        return String(error);
+    }, [error]);
+    
+    const version = data?.version;
 
     return (
         <div>
             <h2>Reponse du serveur gRPC</h2>
-            {error && <pre>{error}</pre>}
+            {isLoading && <div>Loading...</div>}
+            {errorMessage && <pre>{errorMessage}</pre>}
             {version && <div>{version}</div>}
         </div>
     )

@@ -1,18 +1,43 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
+import {createVersionClient} from "../grpc/versionClient";
 
-// API RTK Query minimale (exemple HTTP).
-// Si tu veux appeler le gRPC-web existant, on peut remplacer fetchBaseQuery
-// par un baseQuery custom qui utilise ./grpc/versionClient.
+export type GetVersionData = {
+    version: string;
+};
+
+export type GrpcQueryError = {
+    message: string;
+    code?: string | number;
+};
+
 export const versionApi = createApi({
     reducerPath: "versionApi",
-    // Base query minimaliste (no-op) pour éviter d'imposer `fetch`/polyfill côté Node/Jest.
-    // À remplacer par fetchBaseQuery(...) ou un baseQuery custom quand tu brancheras un backend.
+    // Pas de REST HTTP: on utilise `queryFn` dans les endpoints pour appeler gRPC-web directement.
+    // On garde un baseQuery "dummy" qui ne sera pas utilisé.
     baseQuery: async () => ({data: undefined}),
     endpoints: (builder) => ({
-        // Endpoint d'exemple. À adapter au backend REST/HTTP si disponible.
-        getVersion: builder.query<{ version: string }, void>({
-            query: () => "version",
-        }),
+        getVersion: builder.query<GetVersionData, void>({
+            async queryFn() {
+                try {
+                    const client = createVersionClient();
+                    // protobuf-ts renvoie typiquement { response, status, headers, trailers }
+                    const {response} = await client.getVersion({});
+
+                    return {data: {version: response.version}};
+                } catch (e) {
+                    const err = e as {
+                        message?: string;
+                        code?: string | number;
+                    };
+                    return {
+                        error: {
+                            message: err?.message ?? "Unknown gRPC error",
+                            code: err?.code,
+                        } satisfies GrpcQueryError,
+                    };
+                }
+            },
+        })
     }),
 });
 
