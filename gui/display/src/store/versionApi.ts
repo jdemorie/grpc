@@ -12,11 +12,13 @@ export type GrpcQueryError = {
 
 export const versionApi = createApi({
     reducerPath: "versionApi",
+    tagTypes: ["Version"],
     // Pas de REST HTTP: on utilise `queryFn` dans les endpoints pour appeler gRPC-web directement.
     // On garde un baseQuery "dummy" qui ne sera pas utilisé.
     baseQuery: async () => ({data: undefined}),
     endpoints: (builder) => ({
         getVersion: builder.query<GetVersionData, void>({
+            providesTags: ["Version"],
             async queryFn() {
                 try {
                     const client = createVersionClient();
