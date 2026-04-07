@@ -1,8 +1,10 @@
 import {useEffect, useState} from "react";
 import {createVersionClient} from "../../grpc/versionClient.ts";
+import {useGetVersion, useSetVersion} from "../../store/versionSlice.ts";
 
 function VersionPage() {
-    const [version, setVersion] = useState<string | null>(null);
+    const version = useGetVersion();
+    const setVersion = useSetVersion();
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
